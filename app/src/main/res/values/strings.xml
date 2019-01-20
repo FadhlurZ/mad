@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MADApp</string>
+    <string name="add">Add</string>
+    <string name="view_data">View data</string>
+    <string name="delete">Delete</string>
+    <string name="save">save</string>
+</resources>
