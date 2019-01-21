@@ -32,12 +32,10 @@ public class ListDataActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
-        mListView = (ListView) findViewById(R.id.listView);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mDatabaseHelper = new DatabaseHelper(this);
 
         // Populate the views to show the data from the ArrayList
-        populateListView();
         populateRecyclerView();
     }
 
@@ -45,7 +43,6 @@ public class ListDataActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        populateListView();
         populateRecyclerView();
     }
 
@@ -54,57 +51,19 @@ public class ListDataActivity extends AppCompatActivity {
         Cursor data = mDatabaseHelper.getData();
 
         ArrayList<String> recyclerViewData = new ArrayList<>();
+        ArrayList<Integer> recyclerViewInt = new ArrayList<>();
 
         // Add the received data to the ArrayList
         while (data.moveToNext()) {
             recyclerViewData.add(data.getString(1));
+            recyclerViewInt.add(data.getInt(0));
+            System.out.println(data.getInt(0));
         }
 
         mLayoutManager = new LinearLayoutManager(this);
-        mAdapter = new RecyclerViewAdapter(recyclerViewData);
+        mAdapter = new RecyclerViewAdapter(recyclerViewData, recyclerViewInt);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-    }
-
-    private void populateListView() {
-        Log.d(TAG, "populateListView: Displaying the data in the ListView");
-
-        // Get the data from the database
-        Cursor data = mDatabaseHelper.getData();
-
-        // Add the received data to the ArrayList
-        ArrayList<String> listData = new ArrayList<>();
-        while (data.moveToNext()) {
-            listData.add(data.getString(1));
-        }
-
-        ListAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listData);
-        mListView.setAdapter(adapter);
-
-        // If data has been selected, start intent to edit or delete the data
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                String name = adapterView.getItemAtPosition(position).toString();
-                Log.d(TAG, "onItemClick: You clicked on " + name);
-
-                Cursor data = mDatabaseHelper.getItemID(name);
-                int itemID = -1;
-                while (data.moveToNext()) {
-                    itemID = data.getInt(0);
-                }
-                if (itemID > -1) {
-                    Log.d(TAG, "onItemClick: id selected is: " + itemID);
-                    Intent editScreenIntent = new Intent(ListDataActivity.this, EditDataActivity.class);
-                    editScreenIntent.putExtra("id", itemID);
-                    editScreenIntent.putExtra("name" , name);
-                    startActivity(editScreenIntent);
-                }
-                else {
-                    toastMessage("No ID known with that name");
-                }
-            }
-        });
     }
 
     // Displays a toast message
